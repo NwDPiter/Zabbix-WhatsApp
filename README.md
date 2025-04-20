@@ -1,15 +1,31 @@
-# Zabbix-n8n-WhatsApp
-Esse repositório tem como alvo fazer a integração entre 3 serviços.
+# 🤖 Bot WhatsApp com Webhook para Zabbix
 
-Zabbix -> n8n -> WhatsApp
+Este projeto cria um bot que se conecta ao WhatsApp Web e permite o envio de mensagens para grupos via requisição HTTP. Ideal para integrações com sistemas de monitoramento como o **Zabbix**, via **webhooks**.
 
-## Explicação
+---
 
-1º Zabbix configurado para enviar uma requisição via webhook no link do n8n em caso de incidente
+## 🚀 Funcionalidades
 
-- Cada incidente no zabbix tem seu link no n8n que vai responder de acordo com a requisição
-    
-2º N8N configurado para após receber a requisição, chamar a API que vai enviar uma mesagem em um grupo do WhatsApp
+- Conecta ao WhatsApp via [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)
+- Expõe uma rota HTTP `/send` para envio de mensagens
+- Suporte a **mensagens para grupos**
+- Deploy via **Docker**
+- Compatível com **Traefik** (incluindo autenticação básica opcional)
+- Ideal para receber alertas do Zabbix via webhook
 
-3º Por fim a API, que vai enviar a mesagem para o grupo informado no cabeçalho da requisição 
+---
 
+## 📦 Requisitos
+
+- Node.js 18+ (para rodar localmente) **ou**
+- Docker + Docker Compose
+- Navegador (Puppeteer já cuida disso)
+- WhatsApp logado (via QR Code)
+
+---
+
+## 🧑‍💻 Executando localmente
+
+```bash
+npm install
+node index.js
