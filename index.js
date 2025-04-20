@@ -89,5 +89,11 @@ app.listen(PORT, () => {
   logger.info(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
 
+// Middleware para logar todas as requisições recebidas
+app.use((req, res, next) => {
+  logger.info(`📥 Requisição recebida: ${req.method} ${req.originalUrl} - IP: ${req.ip}`);
+  next();
+});
+
 // Inicializa o cliente do WhatsApp
 client.initialize();
