@@ -23,7 +23,6 @@ jobs:
       matrix:
         include:
           - language: javascript-typescript
-            build-mode: auto
 
     steps:
     - name: Checkout repository
@@ -34,7 +33,7 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Install dependencies (optional)
+    - name: Install dependencies 
       run: npm install
 
     - name: Initialize CodeQL
