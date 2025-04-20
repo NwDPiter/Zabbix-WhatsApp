@@ -1,0 +1,20 @@
+# Ignora a pasta node_modules
+/node_modules/
+
+# Ignora o arquivo de logs
+/app.log
+
+# Ignora a pasta de autenticação do WhatsApp Web
+/.wwebjs_auth/
+
+# Ignora a pasta de cache do WhatsApp Web
+/.wwebjs_cache/
+
+# Ignora arquivos de sistema específicos do editor
+.DS_Store
+
+# Ignora arquivos de configuração do editor (ex: VSCode)
+.vscode/
+
+# Ignora arquivos de ambiente
+.env
