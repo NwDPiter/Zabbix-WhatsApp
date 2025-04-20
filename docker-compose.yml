@@ -1,11 +1,41 @@
-version: '3.8'
+networks:
+  web:
+    external: true
+
+volumes:
+  auth:
+    driver: local
+    driver_opts: 
+      type: none
+      o: bind
+      device: ${DEVICE}
+  cache:
+    driver: local
+    driver_opts: 
+      type: none
+      o: bind
+      device: ${DEVICE}
+
+# OBS: Caso não queira usar os volumes de modo que o container armazene em um diretório local configurado por você, 
+# comente as linhas de volumes (auth e cache) que tem um # na frete e descomente as linhas que estão logo abaixo, assim o container irá criar os diretórios
+# dentro do próprio container e não irá persistir os dados após o mesmo ser removido.
 
 services:
-  whatsapp-bot:
-    build: .
-    container_name: whatsapp-bot
-    ports:
-      - "3000:3000"
+  whatsapp-api:
+    image: latixa12/api:latest
+    container_name: whatsapp-api
+    networks: [web]
     volumes:
-      - ./.wwebjs_auth:/usr/src/app/.wwebjs_auth
-    restart: always
+      - auth:/app/.wwebjs_auth   #
+      - cache:/app/.wwebjs_cache #
+      #- ./.wwebjs_auth:/app/.wwebjs_auth
+      #- ./.wwebjs_cache:/app/.wwebjs_cache
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      - traefik.http.routers.whatsapp-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/send`)
+      - traefik.http.routers.whatsapp-api.entrypoints=websecure
+      - traefik.http.routers.whatsapp-api.tls.certresolver=le
+      - traefik.http.routers.whatsapp-api.middlewares=auth
+      - traefik.http.middlewares.auth.basicauth.users=${BASIC_AUTH}
+

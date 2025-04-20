@@ -9,7 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  Push-to-DockerHub:
+    name: Push to Docker Hub
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest  
     steps:
@@ -30,4 +31,11 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/api:latest
 
+      - name: Aguardo imagem chegar ao dockerhub
+        run: |
+          echo "Aguardo imagem chegar ao docker hub..."
+          sleep 12
+
+      - name: Atualizando ambiente de produção
+        run: curl ${{ secrets.URL_UPDATE_PORTAINER }}
           
