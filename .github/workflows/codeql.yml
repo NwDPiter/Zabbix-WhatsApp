@@ -35,7 +35,7 @@ jobs:
         node-version: '18'
 
     - name: Install dependencies (optional)
-      run: npm ci
+      run: npm Install
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
