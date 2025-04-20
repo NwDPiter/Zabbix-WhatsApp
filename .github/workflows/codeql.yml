@@ -1,8 +1,8 @@
 name: "CodeQL Advanced"
 
 on:
-  push:
-    branches: [ "main", "dev" ]
+  schedule:
+    - cron: '0 * * * *' # Executa a cada hora
 
 jobs:
   analyze:
