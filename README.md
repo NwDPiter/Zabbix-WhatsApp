@@ -58,7 +58,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.whatsapp-api.rule=Host(`suaurl.com`) && PathPrefix(`/send`)"
       - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
-      - "traefik.http.routers.whatsapp-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
       - "traefik.http.middlewares.auth.basicauth.users=usuario:senha_encriptada"
       - "traefik.http.routers.whatsapp-api.middlewares=auth"
     volumes:
@@ -71,7 +71,11 @@ networks:
   web:
     external: true
 ```
-> 🔐 Gere a senha com `htpasswd -nb user password` ou online em: https://hostingcanada.org/htpasswd-generator/
+> 🔐 Gere a senha com `htpasswd -nbB admin senha` ou online em: https://bcrypt-generator.com/
+
+Retornado algo como:
+
+    `admin:$2y$05$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
 
 ## 📬 Endpoint da API
 ### URL

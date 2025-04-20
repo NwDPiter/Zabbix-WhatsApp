@@ -1,20 +1,41 @@
-# Usa uma imagem oficial do Node.js baseada em Debian, com tamanho reduzido
 FROM node:22-slim
 
-# Define o diretório de trabalho dentro do container
-WORKDIR /usr/src/app
+# Instala dependências necessárias para o Chromium
+RUN apt-get update && apt-get install -y \
+    wget \
+    ca-certificates \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libgdk-pixbuf2.0-0 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
+    libgbm1 \
+    libgtk-3-0 \
+    libdrm2 \
+    libxshmfence1 \
+    --no-install-recommends && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copia os arquivos de dependência para o container
-COPY package*.json ./
+# Define diretório de trabalho
+WORKDIR /app
 
-# Instala apenas as dependências de produção (sem dependências de desenvolvimento)
-RUN npm install --production
-
-# Copia todo o restante do código para o diretório de trabalho
+# Copia os arquivos da aplicação
 COPY . .
 
-# Expõe a porta que o app usará (importante para Traefik ou acesso externo)
+# Instala dependências Node.js
+RUN npm install
+
+# Expõe a porta da aplicação
 EXPOSE 3000
 
-# Comando que será executado ao iniciar o container
+# Comando de inicialização
 CMD ["node", "index.js"]
