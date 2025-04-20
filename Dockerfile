@@ -1,5 +1,5 @@
 # Usa uma imagem oficial do Node.js baseada em Debian, com tamanho reduzido
-FROM node:22-slin
+FROM node:22-slim
 
 # Define o diretório de trabalho dentro do container
 WORKDIR /usr/src/app
