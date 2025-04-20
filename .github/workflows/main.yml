@@ -1,6 +1,8 @@
 name: "API"
 
 on:
+  push:
+    branches: [dev]
   pull_request:
     types: [closed]
     branches: [main]

@@ -33,6 +33,11 @@ client.on('qr', qr => {
   qrcode.generate(qr, { small: true });
 });
 
+// Evento de autenticação
+client.on('authenticated', () => {
+  logger.info(`🔐 Autenticação realizada com sucesso em ${new Date().toLocaleString()}`);
+});
+
 // Evento de bot pronto
 client.on('ready', () => {
   logger.info('✅ Bot conectado ao WhatsApp!');
@@ -41,7 +46,6 @@ client.on('ready', () => {
 
 // Endpoint para enviar mensagens
 app.post('/send', async (req, res) => {
-  //logger.info('Payload recebido: ', req.body);
 
   if (!isReady) {
     logger.warn('Bot ainda não está pronto');
