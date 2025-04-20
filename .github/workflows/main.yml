@@ -36,5 +36,5 @@ jobs:
           sleep 12
 
       - name: Atualizando ambiente de produção
-        run: curl ${{ secrets.URL_UPDATE_PORTAINER }}
+        run: curl --location POST ${{ secrets.URL_UPDATE_PORTAINER }}
           

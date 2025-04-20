@@ -30,7 +30,6 @@ services:
       - cache:/app/.wwebjs_cache #
       #- ./.wwebjs_auth:/app/.wwebjs_auth
       #- ./.wwebjs_cache:/app/.wwebjs_cache
-    command: [--accesslog=true]
     labels:
       - traefik.enable=true
       - traefik.docker.network=web
