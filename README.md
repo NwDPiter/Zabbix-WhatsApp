@@ -71,11 +71,15 @@ networks:
   web:
     external: true
 ```
-> 🔐 Gere a senha com `htpasswd -nbB admin senha` ou online em: https://bcrypt-generator.com/
+> 🔐 Gere a senha com `htpasswd -nb admin senha` ou online em: https://bcrypt-generator.com/
 
 Retornado algo como:
 
     `admin:$2y$05$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
+
+OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicione mais um "$", se não passar o docker vai entender como uma variável, fica assim:
+
+    `admin:$$2y$$05$$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
 
 ## 📬 Endpoint da API
 ### URL
