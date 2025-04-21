@@ -30,9 +30,9 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/api:latest
 
-      - name: Aguardo imagem chegar ao dockerhub
+      - name: Esperando...
         run: |
-          echo "Aguardo imagem chegar ao docker hub..."
+          echo "Aguardando imagem chegar ao docker hub..."
           sleep 12
 
       - name: Atualizando ambiente de produção
