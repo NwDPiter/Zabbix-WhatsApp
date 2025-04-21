@@ -31,11 +31,13 @@ services:
       #- ./.wwebjs_auth:/app/.wwebjs_auth
       #- ./.wwebjs_cache:/app/.wwebjs_cache
     labels:
-      - traefik.enable=true
-      - traefik.docker.network=web
-      - traefik.http.routers.whatsapp-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/send`)
-      - traefik.http.routers.whatsapp-api.entrypoints=websecure
-      - traefik.http.routers.whatsapp-api.tls.certresolver=le
-      - traefik.http.routers.whatsapp-api.middlewares=auth
-      - traefik.http.middlewares.auth.basicauth.users=${BASIC_AUTH}
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.whatsapp-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/send`)"
+      - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
+      - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
+
+      # 🔐 Middleware basicAuth
+      - "traefik.http.routers.whatsapp-api.middlewares=basic-auth-apizap@docker"
+      - 'traefik.http.middlewares.basic-auth-apizap.basicauth.users=${BASIC_AUTH}'
 
