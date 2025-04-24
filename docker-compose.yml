@@ -33,7 +33,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.whatsapp-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/send`)"
+      - "traefik.http.routers.whatsapp-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
       - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
 
