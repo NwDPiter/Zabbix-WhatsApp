@@ -112,7 +112,3 @@ OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicio
 ## ✨ Contribuições
 Sinta-se livre para abrir issues, PRs ou ideias no repositório: [https://github.com/NwDPiter/Zabbix-WhatsApp](https://github.com/NwDPiter/Zabbix-WhatsApp)
 
----
-
-Feito com ❤️ para automações com Zabbix e WhatsApp.
-
