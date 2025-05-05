@@ -85,7 +85,7 @@ OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, ins
 echo -n 'SEULogin:SUASenha' | base64
 ```
 
-Vai retornal algo como:
+Vai retornar algo como:
 ```
 YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
 ```
@@ -109,17 +109,19 @@ curl -X POST http://localhost:3000/send \
 
 ![alt text](/doc/Posauth.png)
 
-### Dependendo de como seja armazenado os diretórios de autenticar que são gerados, a conexão será direta:
+### Dependendo de como seja armazenado os diretórios de autenticação que serão gerados, a conexão será direta:
 
 ![alt text](/doc/ConexaoDireta.png)
 
 ### Diretorios gerados são:
  - .wwebjs_auth
  - .wwebjs_cache
+   
+OBS: Caso exclua-os terá que autenticar novamente.
 
 ## 📬 Endpoint da API
 ### URL
-`POST /send`
+`POST /send-group`
 
 ### Body JSON
 ```json
@@ -165,4 +167,3 @@ curl -X POST http://localhost:3000/send \
 
 ## ✨ Contribuições
 Sinta-se livre para abrir issues, PRs ou ideias no repositório: [https://github.com/NwDPiter/Zabbix-WhatsApp](https://github.com/NwDPiter/Zabbix-WhatsApp)
-
