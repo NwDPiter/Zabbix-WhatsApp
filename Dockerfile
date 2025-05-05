@@ -38,4 +38,4 @@ RUN npm install
 EXPOSE 3000
 
 # Comando de inicialização
-CMD ["node", "index.js"]
+CMD ["node", "src/server.js"]
