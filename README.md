@@ -1,18 +1,20 @@
-# 📦 Zabbix WhatsApp Alert Bot
+# 📦 WhatsApp Alert Bot
 
-Este projeto permite que alertas do Zabbix sejam enviados automaticamente para grupos do WhatsApp via integração com [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js).
+Este projeto permite enviar alertas automaticamente para grupos do WhatsApp usando a biblioteca [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js). Ele pode ser integrado ao Zabbix via webhook ou usado em scripts agendados com `cron`.
 
 ## 🚀 O que o projeto automatiza?
 - Recebe requisições HTTP com alertas do Zabbix (via webhook).
+- Pode ser chamado via `curl` em scripts executados por `cron`.
 - Localiza o grupo do WhatsApp configurado.
 - Envia a mensagem de alerta automaticamente.
 
 ## 🛠 Requisitos
-- Node.js 18+
+- Node.js 18+ (para rodar localmente)
 - Conta do WhatsApp válida
-- Zabbix configurado para enviar alertas por webhook
-- Docker (opcional)
-- Traefik (opcional para exposição segura)
+- Docker (recomendado)
+- Zabbix configurado com webhook (opcional)
+- Cron (opcional, para agendamentos)
+- Traefik (opcional para exposição segura com autenticação)
 
 ## 📁 Clonando o projeto
 ```bash
@@ -28,10 +30,6 @@ npm start
 Ao iniciar, será exibido um QR Code no terminal. Escaneie com seu WhatsApp.
 
 ## 🐳 Rodando com Docker
-### Build da imagem:
-```bash
-docker build -t latixa12/api .
-```
 
 ### docker-compose (sem Traefik):
 ```yaml
@@ -80,6 +78,44 @@ Retornado algo como:
 OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicione mais um "$", se não passar o docker vai entender como uma variável, fica assim:
 
     `admin:$$2y$$05$$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
+  
+OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, inserindo as credenciais criptografadas em base64, no terminal linux, faça:
+
+```
+echo -n 'SEULogin:SUASenha' | base64
+```
+
+Vai retornal algo como:
+```
+YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
+```
+
+Exemplo de requisição:
+```
+curl -X POST http://localhost:3000/send \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Basic YWRtaW46bWluaGFTZW5oYTEyMw==" \
+  -d '{
+    "group": "API",
+    "message": "Olá, isso é um teste automatizado 🚀😊"
+}'
+```
+
+## Quando subir a 1º essa aplicação, será necessário autenticar seu WhatsApp via QR que vai aparecer no teminal:
+
+![alt text](/doc/QR.png)
+
+### Depois de autenticar, vai aparecer as confirmações
+
+![alt text](/doc/Posauth.png)
+
+### Dependendo de como seja armazenado os diretórios de autenticar que são gerados, a conexão será direta:
+
+![alt text](/doc/ConexaoDireta.png)
+
+### Diretorios gerados são:
+ - .wwebjs_auth
+ - .wwebjs_cache
 
 ## 📬 Endpoint da API
 ### URL
@@ -107,6 +143,24 @@ OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicio
   "group": "Alertas Zabbix",
   "message": "{HOST.NAME} está com problema: {TRIGGER.NAME}"
 }
+```
+
+## Utilização com cron (via curl)
+### Crie um script bash para enviar mensagens agendadas:
+
+```bash
+#!/bin/bash
+curl -X POST http://localhost:3000/send \
+  -H "Content-Type: application/json" \
+  -d '{"group": "Alertas Diários", "message": "Backup finalizado com sucesso."}'
+```
+## Agende o script utilizando o crontab:
+
+    crontab -e
+
+## Adicione a seguinte linha para executar diariamente:
+```perl
+0 1 * * * /caminho/para/o/script.sh
 ```
 
 ## ✨ Contribuições
