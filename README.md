@@ -121,7 +121,7 @@ OBS: Caso exclua-os terá que autenticar novamente.
 
 ## 📬 Endpoint da API
 ### URL
-`POST /send`
+`POST /send-group`
 
 ### Body JSON
 ```json
