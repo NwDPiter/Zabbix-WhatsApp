@@ -85,7 +85,7 @@ OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, ins
 echo -n 'SEULogin:SUASenha' | base64
 ```
 
-Vai retornal algo como:
+Vai retornar algo como:
 ```
 YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
 ```
