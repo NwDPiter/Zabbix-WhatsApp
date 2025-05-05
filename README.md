@@ -109,13 +109,15 @@ curl -X POST http://localhost:3000/send \
 
 ![alt text](/doc/Posauth.png)
 
-### Dependendo de como seja armazenado os diretórios de autenticar que são gerados, a conexão será direta:
+### Dependendo de como seja armazenado os diretórios de autenticação que serão gerados, a conexão será direta:
 
 ![alt text](/doc/ConexaoDireta.png)
 
 ### Diretorios gerados são:
  - .wwebjs_auth
  - .wwebjs_cache
+   
+OBS: Caso exclua-os terá que autenticar novamente.
 
 ## 📬 Endpoint da API
 ### URL
