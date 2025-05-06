@@ -86,13 +86,8 @@ OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, ins
 echo -n 'SEULogin:SUASenha' | base64
 ```
 
-<<<<<<< HEAD
 Vai retornar algo como:
 ```
-=======
-Vai retornal algo como:
-```bash
->>>>>>> 7dee9ca (scripts e correção de readme)
 YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
 ```
 
