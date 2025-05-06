@@ -18,3 +18,7 @@
 
 # Ignora arquivos de ambiente
 .env
+
+# Ignora arquivos de estados
+/src/scripts/estado_com_auth.json 
+/src/scripts/estado_sem_auth.json

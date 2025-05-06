@@ -68,6 +68,7 @@ services:
 networks:
   web:
     external: true
+
 ```
 > 🔐 Gere a senha com `htpasswd -nb admin senha` ou online em: https://bcrypt-generator.com/
 
@@ -81,18 +82,18 @@ OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicio
   
 OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, inserindo as credenciais criptografadas em base64, no terminal linux, faça:
 
-```
+```bash
 echo -n 'SEULogin:SUASenha' | base64
 ```
 
 Vai retornal algo como:
-```
+```bash
 YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
 ```
 
 Exemplo de requisição:
-```
-curl -X POST http://localhost:3000/send \
+```yml
+curl -X POST http://localhost:3000/api/send-group \
   -H "Content-Type: application/json" \
   -H "Authorization: Basic YWRtaW46bWluaGFTZW5oYTEyMw==" \
   -d '{
@@ -109,7 +110,7 @@ curl -X POST http://localhost:3000/send \
 
 ![alt text](/doc/Posauth.png)
 
-### Dependendo de como seja armazenado os diretórios de autenticar que são gerados, a conexão será direta:
+### Dependendo de como seja armazenado os diretórios de autenticação que serão gerados, a conexão será direta:
 
 ![alt text](/doc/ConexaoDireta.png)
 
@@ -148,9 +149,9 @@ curl -X POST http://localhost:3000/send \
 ## Utilização com cron (via curl)
 ### Crie um script bash para enviar mensagens agendadas:
 
-```bash
+```yml
 #!/bin/bash
-curl -X POST http://localhost:3000/send \
+curl -X POST http://localhost:3000/api/send-group \
   -H "Content-Type: application/json" \
   -d '{"group": "Alertas Diários", "message": "Backup finalizado com sucesso."}'
 ```
