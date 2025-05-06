@@ -68,6 +68,7 @@ services:
 networks:
   web:
     external: true
+
 ```
 > 🔐 Gere a senha com `htpasswd -nb admin senha` ou online em: https://bcrypt-generator.com/
 
@@ -81,7 +82,7 @@ OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicio
   
 OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, inserindo as credenciais criptografadas em base64, no terminal linux, faça:
 
-```
+```bash
 echo -n 'SEULogin:SUASenha' | base64
 ```
 
@@ -91,8 +92,8 @@ YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
 ```
 
 Exemplo de requisição:
-```
-curl -X POST http://localhost:3000/send \
+```yml
+curl -X POST http://localhost:3000/api/send-group \
   -H "Content-Type: application/json" \
   -H "Authorization: Basic YWRtaW46bWluaGFTZW5oYTEyMw==" \
   -d '{
@@ -150,9 +151,9 @@ OBS: Caso exclua-os terá que autenticar novamente.
 ## Utilização com cron (via curl)
 ### Crie um script bash para enviar mensagens agendadas:
 
-```bash
+```yml
 #!/bin/bash
-curl -X POST http://localhost:3000/send \
+curl -X POST http://localhost:3000/api/send-group \
   -H "Content-Type: application/json" \
   -d '{"group": "Alertas Diários", "message": "Backup finalizado com sucesso."}'
 ```
@@ -167,4 +168,3 @@ curl -X POST http://localhost:3000/send \
 
 ## ✨ Contribuições
 Sinta-se livre para abrir issues, PRs ou ideias no repositório: [https://github.com/NwDPiter/Zabbix-WhatsApp](https://github.com/NwDPiter/Zabbix-WhatsApp)
-
