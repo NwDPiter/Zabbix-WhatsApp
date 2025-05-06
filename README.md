@@ -86,8 +86,13 @@ OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, ins
 echo -n 'SEULogin:SUASenha' | base64
 ```
 
+<<<<<<< HEAD
+Vai retornar algo como:
+```
+=======
 Vai retornal algo como:
 ```bash
+>>>>>>> 7dee9ca (scripts e correção de readme)
 YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
 ```
 
@@ -117,10 +122,12 @@ curl -X POST http://localhost:3000/api/send-group \
 ### Diretorios gerados são:
  - .wwebjs_auth
  - .wwebjs_cache
+   
+OBS: Caso exclua-os terá que autenticar novamente.
 
 ## 📬 Endpoint da API
 ### URL
-`POST /send`
+`POST /send-group`
 
 ### Body JSON
 ```json
@@ -166,4 +173,3 @@ curl -X POST http://localhost:3000/api/send-group \
 
 ## ✨ Contribuições
 Sinta-se livre para abrir issues, PRs ou ideias no repositório: [https://github.com/NwDPiter/Zabbix-WhatsApp](https://github.com/NwDPiter/Zabbix-WhatsApp)
-
