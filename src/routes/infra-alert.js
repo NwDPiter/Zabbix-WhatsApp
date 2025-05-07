@@ -3,7 +3,7 @@ const router = express.Router();
 const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
 
-router.post('/send-group', async (req, res) => {
+router.post('/infra-alert', async (req, res) => {
   if (!isReady()) {
     logger.warn('Bot ainda não está pronto');
     return res.status(503).json({ error: "Bot ainda não está pronto." });

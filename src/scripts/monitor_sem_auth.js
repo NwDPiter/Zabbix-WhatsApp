@@ -43,7 +43,7 @@ function salvarEstado(estado) {
 }
 
 // URL do serviço de notificação (sem auth)
-const urlNotificacao = "http://localhost:3000/api/send-group";
+const urlNotificacao = "http://localhost:3000/api/infra-alert";
 
 // Envia uma notificação para o grupo
 async function notificar(grupo, mensagem) {

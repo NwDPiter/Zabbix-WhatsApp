@@ -1,0 +1,53 @@
+#name: Notificar Status da PR
+#
+#on:
+#  pull_request:
+#    types: [closed]
+#  pull_request_review:
+#    types: [submitted]
+#
+#jobs:
+#  notify:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      # Obter o código do repositório
+#      - name: Checkout do repositório
+#        uses: actions/checkout@v3
+#
+#      # Enviar notificação para o webhook
+#      - name: Enviar notificação para o webhook
+#        if: github.event.review.state == 'approved' || github.event.pull_request.merged == true
+#        env:
+#          URL_API: ${{ secrets.URL_API }}  # Certifique-se de definir isso nos secrets do seu repositório
+#          GROUP: ${{ secrets.GROUP }}      # Certifique-se de definir isso nos secrets do seu repositório
+#        run: |
+#          curl -X POST "$URL_API" \
+#            -H "Content-Type: application/json" \
+#            -H "x-github-event: ${{ github.event_name }}" \
+#            -d '{
+#              "group": "'"$GROUP"'",
+#              "review": {
+#                "state": "${{ github.event.review.state || "" }}",
+#                "user": {
+#                  "login": "${{ github.event.review.user.login || "" }}"
+#                }
+#              },
+#              "pull_request": {
+#                "title": "${{ github.event.pull_request.title }}",
+#                "html_url": "${{ github.event.pull_request.html_url }}",
+#                "user": {
+#                  "login": "${{ github.event.pull_request.user.login }}"
+#                },
+#                "merged_by": {
+#                  "login": "${{ github.event.pull_request.merged_by.login || "" }}"
+#                },
+#                "head": {
+#                  "ref": "${{ github.event.pull_request.head.ref }}"
+#                },
+#                "base": {
+#                  "ref": "${{ github.event.pull_request.base.ref }}"
+#                },
+#                "merged": ${{ github.event.pull_request.merged }}
+#              }
+#            }'

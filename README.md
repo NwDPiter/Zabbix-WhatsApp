@@ -1,9 +1,13 @@
 # 📦 WhatsApp Alert Bot
 
-Este projeto permite enviar alertas automaticamente para grupos do WhatsApp usando a biblioteca [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js). Ele pode ser integrado ao Zabbix via webhook ou usado em scripts agendados com `cron`.
+Este projeto permite enviar alertas automaticamente para grupos do WhatsApp usando a biblioteca [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js). Ele pode ser integrado ao Zabbix e Github via webhook ou usado em scripts agendados com `cron`.
 
 ## 🚀 O que o projeto automatiza?
-- Recebe requisições HTTP com alertas do Zabbix (via webhook).
+- Recebe requisições HTTP/HTTPS
+
+  - Com alertas do Zabbix (via webhook).
+  - Com informções sobre PRs do Github (via webhook).
+
 - Pode ser chamado via `curl` em scripts executados por `cron`.
 - Localiza o grupo do WhatsApp configurado.
 - Envia a mensagem de alerta automaticamente.
@@ -92,8 +96,8 @@ YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
 ```
 
 Exemplo de requisição:
-```yml
-curl -X POST http://localhost:3000/api/send-group \
+```bash
+curl -X POST http://localhost:3000/api/infra-alert \
   -H "Content-Type: application/json" \
   -H "Authorization: Basic YWRtaW46bWluaGFTZW5oYTEyMw==" \
   -d '{
@@ -120,11 +124,12 @@ curl -X POST http://localhost:3000/api/send-group \
    
 OBS: Caso exclua-os terá que autenticar novamente.
 
-## 📬 Endpoint da API
-### URL
-`POST /send-group`
+## 📬 Endpoints da API
 
-### Body JSON
+### 📍Rota
+`POST /infra-alert`
+
+### 📤 Body JSON
 ```json
 {
   "group": "Nome do Grupo",
@@ -132,7 +137,7 @@ OBS: Caso exclua-os terá que autenticar novamente.
 }
 ```
 
-### Exemplo de resposta
+### ✅ Exemplo de resposta
 ```json
 {
   "success": true,
@@ -148,12 +153,76 @@ OBS: Caso exclua-os terá que autenticar novamente.
 }
 ```
 
+### 📍Rota
+`POST /github-notify`
+
+### Body JSON
+```json
+{
+  "group": "Nome do Grupo",
+  "review": {
+    "state": "approved"
+  },
+  "pull_request": {
+    "title": "Título da Pull Request",
+    "html_url": "https://github.com/seu-repo/seu-projeto/pull/42",
+    "user": {
+      "login": "autor-da-pr"
+    },
+    "head": {
+      "ref": "feature/branch-origem"
+    },
+    "base": {
+      "ref": "main"
+    },
+    "merged": true
+  }
+}
+```
+
+### ✅ Exemplo de resposta
+```json
+{
+  "success": true,
+  "message": "Mensagem enviada com sucesso!"
+}
+```
+
+### 💪 Exemplo de uso no GitHub Actions (workflow)
+```yml
+- name: Enviar notificação para o WhatsApp
+  run: |
+    curl -X POST "${{ secrets.WEBHOOK_URL }}" \
+      -H "Content-Type: application/json" \
+      -H "x-github-event: ${{ github.event_name }}" \
+      -d '{
+        "group": "Time de Devs",
+        "review": {
+          "state": "${{ github.event.review.state || "" }}"
+        },
+        "pull_request": {
+          "title": "${{ github.event.pull_request.title }}",
+          "html_url": "${{ github.event.pull_request.html_url }}",
+          "user": {
+            "login": "${{ github.event.pull_request.user.login }}"
+          },
+          "head": {
+            "ref": "${{ github.event.pull_request.head.ref }}"
+          },
+          "base": {
+            "ref": "${{ github.event.pull_request.base.ref }}"
+          },
+          "merged": ${{ github.event.pull_request.merged || false }}
+        }
+      }'
+```
+
 ## Utilização com cron (via curl)
 ### Crie um script bash para enviar mensagens agendadas:
 
 ```yml
 #!/bin/bash
-curl -X POST http://localhost:3000/api/send-group \
+curl -X POST http://localhost:3000/api/infra-alert \
   -H "Content-Type: application/json" \
   -d '{"group": "Alertas Diários", "message": "Backup finalizado com sucesso."}'
 ```
@@ -167,4 +236,4 @@ curl -X POST http://localhost:3000/api/send-group \
 ```
 
 ## ✨ Contribuições
-Sinta-se livre para abrir issues, PRs ou ideias no repositório: [https://github.com/NwDPiter/Zabbix-WhatsApp](https://github.com/NwDPiter/Zabbix-WhatsApp)
+Sinta-se livre para abrir issues, PRs ou ideias no repositório: [https://github.com/NwDPiter/whatsapp_alert_bot_api.git](https://github.com/NwDPiter/whatsapp_alert_bot_api.git)
