@@ -57,6 +57,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV }}" > .env
+
+
       - name: Log in to Docker Registry
         uses: docker/login-action@v3
         with:

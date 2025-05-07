@@ -8,13 +8,13 @@ volumes:
     driver_opts: 
       type: none
       o: bind
-      device: ${DEVICE}
+      device: ${LOCAL_DEVICE}
   cache:
     driver: local
     driver_opts: 
       type: none
       o: bind
-      device: ${DEVICE}
+      device: ${LOCAL_DEVICE}
 
 # OBS: Caso não queira usar os volumes de modo que o container armazene em um diretório local configurado por você, 
 # comente as linhas de volumes (auth e cache) que tem um # na frete e descomente as linhas que estão logo abaixo, assim o container irá criar os diretórios
@@ -28,14 +28,15 @@ services:
     volumes:
       - auth:/app/.wwebjs_auth   #
       - cache:/app/.wwebjs_cache #
-      #- ./.wwebjs_auth:/app/.wwebjs_auth
-      #- ./.wwebjs_cache:/app/.wwebjs_cache
+      #- .wwebjs_auth:/app/.wwebjs_auth
+      #- .wwebjs_cache:/app/.wwebjs_cache
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
       - "traefik.http.routers.whatsapp-api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
       - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
+      - "traefik.http.services.whatsapp-api.loadbalancer.server.port=3000"
 
       # 🔐 Middleware basicAuth
       - "traefik.http.routers.whatsapp-api.middlewares=basic-auth-apizap@docker"
