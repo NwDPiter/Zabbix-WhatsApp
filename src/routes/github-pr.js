@@ -6,7 +6,7 @@ const logger = require('../config/logger');
 router.post('/github-notify', async (req, res) => {
   const event = req.headers['x-github-event'];
   const payload = req.body;
-  const groupName = req.body.group;
+  const groupName = payload.group;
 
   if (!isReady()) {
     logger.warn('Bot ainda não está pronto');
@@ -21,24 +21,29 @@ router.post('/github-notify', async (req, res) => {
   let message = null;
 
   try {
-    if (event === 'pull_request_review' && payload.review.state === 'approved') {
-      const { title, html_url, user, head, base } = payload.pull_request;
+    // Evento: Revisão aprovada
+    if (event === 'pull_request_review' && payload.review?.state === 'approved') {
+      const pr = payload.pull_request || {};
+      const reviewer = payload.review?.user?.login || 'desconhecido';
 
       message = `✅ *PR Aprovada!*
-👤 Autor: ${user.login}
-📄 Título: ${title}
-🌿 De: ${head.ref} → Para: ${base.ref}
-🔗 Link: ${html_url}`;
+👤 Autor: ${pr.user?.login || 'desconhecido'}
+✔️ Aprovada por: ${reviewer}
+📄 Título: ${pr.title || 'Sem título'}
+🌿 De: ${pr.head?.ref || '??'} → Para: ${pr.base?.ref || '??'}
+🔗 Link: ${pr.html_url || 'Sem URL'}`;
     }
 
-    if (event === 'pull_request' && payload.action === 'closed' && payload.pull_request.merged) {
-      const { title, html_url, user, head, base } = payload.pull_request;
+    // Evento: PR fechada e mergeada
+    if (event === 'pull_request' && payload.pull_request?.merged === "true" || payload.pull_request?.merged === true) {
+      const pr = payload.pull_request;
 
       message = `🎉 *PR Mergeada!*
-👤 Autor: ${user.login}
-📄 Título: ${title}
-🌿 De: ${head.ref} → Para: ${base.ref}
-🔗 Link: ${html_url}`;
+👤 Autor: ${pr.user?.login || 'desconhecido'}
+🔀 Feita merge por: ${pr.merged_by?.login || 'desconhecido'}
+📄 Título: ${pr.title || 'Sem título'}
+🌿 De: ${pr.head?.ref || '??'} → Para: ${pr.base?.ref || '??'}
+🔗 Link: ${pr.html_url || 'Sem URL'}`;
     }
 
     if (message) {
@@ -52,19 +57,18 @@ router.post('/github-notify', async (req, res) => {
 
       await client.sendMessage(targetGroup.id._serialized, message);
       logger.info(`
-        -------------------------------------------
-        Mensagem enviada:
-        ${message}
-        Grupo: "${groupName}"
-        Evento: ${event}
-        Data/Hora: ${new Date().toLocaleString()}
-        -------------------------------------------
-      `);
+-------------------------------------------
+Mensagem enviada:
+${message}
+Grupo: "${groupName}"
+Evento: ${event}
+Data/Hora: ${new Date().toLocaleString()}
+-------------------------------------------
+`);
 
       return res.json({ success: true, message: "Mensagem enviada com sucesso!" });
     }
 
-    // Se o evento não for relevante
     return res.status(200).json({ message: "Evento ignorado." });
 
   } catch (error) {

@@ -53,7 +53,7 @@ const headers = {
 };
 
 // URL do serviço de notificação
-const urlNotificacao = "NONE"; // https://SUA_URL/api/send-group || localhost:3000/api/send-group
+const urlNotificacao = "NONE"; // https://SUA_URL/api/infra-alert || localhost:3000/api/infra-alert
 
 // Enviar notificação
 async function notificar(grupo, mensagem) {

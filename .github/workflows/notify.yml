@@ -9,23 +9,38 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
+
     steps:
+      # Enviar notificação para o webhook
       - name: Enviar notificação para o webhook
         if: github.event.review.state == 'approved' || github.event.pull_request.merged == true
+        env:
+          USER: ${{ secrets.BASIC_AUTH_USER }}           # Usuário para autenticação básica
+          PASS: ${{ secrets.BASIC_AUTH_PASSWORD }}       # Senha para autenticação básica
+          URL: ${{ secrets.URL_API }}                   # URL do seu servidor de webhook
+          GROUP: ${{ secrets.GROUP }}                   # Nome do grupo de WhatsApp
         run: |
-          curl -X POST ${{ secrets.WEBHOOK_URL }} \
+          AUTH=$(echo -n "$USER:$PASS" | base64)         
+          curl -X POST "$URL" \
             -H "Content-Type: application/json" \
+            -H "Authorization: Basic $AUTH" \
             -H "x-github-event: ${{ github.event_name }}" \
             -d '{
-              "group": "secrets.group",
+              "group": "'"$GROUP"'",
               "review": {
-                "state": "${{ github.event.review.state || "" }}"
+                "state": "${{ github.event.review.state || "" }}",
+                "user": {
+                  "login": "${{ github.event.review.user.login || "" }}"
+                }
               },
               "pull_request": {
                 "title": "${{ github.event.pull_request.title }}",
                 "html_url": "${{ github.event.pull_request.html_url }}",
                 "user": {
                   "login": "${{ github.event.pull_request.user.login }}"
+                },
+                "merged_by": {
+                  "login": "${{ github.event.pull_request.merged_by.login || "" }}"
                 },
                 "head": {
                   "ref": "${{ github.event.pull_request.head.ref }}"
