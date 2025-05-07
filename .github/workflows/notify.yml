@@ -19,45 +19,35 @@ jobs:
           PASS: ${{ secrets.BASIC_AUTH_PASSWORD }}       # Senha para autenticação básica
           URL: ${{ secrets.URL_API }}                   # URL do seu servidor de webhook
           GROUP: ${{ secrets.GROUP }}                   # Nome do grupo de WhatsApp
-          EVENT_NAME: ${{ github.event_name }}
-          REVIEW_STATE: ${{ github.event.review.state || '' }}
-          REVIEW_USER_LOGIN: ${{ github.event.review.user.login || '' }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_HTML_URL: ${{ github.event.pull_request.html_url }}
-          PR_USER_LOGIN: ${{ github.event.pull_request.user.login }}
-          PR_MERGED_BY_LOGIN: ${{ github.event.pull_request.merged_by.login || '' }}
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
-          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
-          PR_MERGED: ${{ github.event.pull_request.merged }}
         run: |
           AUTH=$(echo -n "$USER:$PASS" | base64)         
           curl -X POST "$URL" \
             -H "Content-Type: application/json" \
             -H "Authorization: Basic $AUTH" \
-            -H "x-github-event: $EVENT_NAME" \
+            -H "x-github-event: ${{ github.event_name }}" \
             -d '{
               "group": "'"$GROUP"'",
               "review": {
-                "state": "'"$REVIEW_STATE"'",
+                "state": "${{ github.event.review.state || "" }}",
                 "user": {
-                  "login": "'"$REVIEW_USER_LOGIN"'"
+                  "login": "${{ github.event.review.user.login || "" }}"
                 }
               },
               "pull_request": {
-                "title": "'"$PR_TITLE"'",
-                "html_url": "'"$PR_HTML_URL"'",
+                "title": "${{ github.event.pull_request.title }}",
+                "html_url": "${{ github.event.pull_request.html_url }}",
                 "user": {
-                  "login": "'"$PR_USER_LOGIN"'"
+                  "login": "${{ github.event.pull_request.user.login }}"
                 },
                 "merged_by": {
-                  "login": "'"$PR_MERGED_BY_LOGIN"'"
+                  "login": "${{ github.event.pull_request.merged_by.login || "" }}"
                 },
                 "head": {
-                  "ref": "'"$PR_HEAD_REF"'"
+                  "ref": "${{ github.event.pull_request.head.ref }}"
                 },
                 "base": {
-                  "ref": "'"$PR_BASE_REF"'"
+                  "ref": "${{ github.event.pull_request.base.ref }}"
                 },
-                "merged": "'"$PR_MERGED"'"
+                "merged": ${{ github.event.pull_request.merged }}
               }
             }'
