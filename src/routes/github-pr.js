@@ -2,6 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
+const authMiddleware = require('../middlewares/auth'); 
+
+
+// Middleware de autenticação
+router.use(authMiddleware);
 
 router.post('/github-notify', async (req, res) => {
   const event = req.headers['x-github-event'];

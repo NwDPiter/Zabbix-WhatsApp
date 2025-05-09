@@ -22,3 +22,7 @@
 # Ignora arquivos de estados
 /src/scripts/estado_com_auth.json 
 /src/scripts/estado_sem_auth.json
+
+# Testes
+/src/middlewares/auth-test.js
+/src/scripts/monitor_com_auth-teste.js
