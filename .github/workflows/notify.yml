@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Enviar notificação para o webhook
+      # Enviar notificação para o webhook~
       - name: Enviar notificação para o webhook
         if: github.event.review.state == 'approved' || github.event.pull_request.merged == true
         env:
