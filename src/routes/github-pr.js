@@ -1,14 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
 const authMiddleware = require('../middlewares/auth'); 
 
-
 // Middleware de autenticação
 router.use(authMiddleware);
 
-router.post('/github-notify', async (req, res) => {
+// Rate limiter para a rota específica
+const githubNotifyLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuto
+  max: 5, // máximo de 5 requisições por IP
+  message: {
+    error: 'Muitas requisições. Tente novamente mais tarde.'
+  }
+});
+
+router.post('/github-notify', githubNotifyLimiter, async (req, res) => {
   const event = req.headers['x-github-event'];
   const payload = req.body;
   const groupName = payload.group;
@@ -26,7 +35,6 @@ router.post('/github-notify', async (req, res) => {
   let message = null;
 
   try {
-    // Evento: Revisão aprovada
     if (event === 'pull_request_review' && payload.review?.state === 'approved') {
       const pr = payload.pull_request || {};
       const reviewer = payload.review?.user?.login || 'desconhecido';
@@ -39,8 +47,7 @@ router.post('/github-notify', async (req, res) => {
 🔗 Link: ${pr.html_url || 'Sem URL'}`;
     }
 
-    // Evento: PR fechada e mergeada
-    if (event === 'pull_request' && payload.pull_request?.merged === "true" || payload.pull_request?.merged === true) {
+    if (event === 'pull_request' && (payload.pull_request?.merged === "true" || payload.pull_request?.merged === true)) {
       const pr = payload.pull_request;
 
       message = `🎉 *PR Mergeada!*
@@ -61,15 +68,7 @@ router.post('/github-notify', async (req, res) => {
       }
 
       await client.sendMessage(targetGroup.id._serialized, message);
-      logger.info(`
--------------------------------------------
-Mensagem enviada:
-${message}
-Grupo: "${groupName}"
-Evento: ${event}
-Data/Hora: ${new Date().toLocaleString()}
--------------------------------------------
-`);
+      logger.info(`Mensagem enviada para o grupo "${groupName}"`);
 
       return res.json({ success: true, message: "Mensagem enviada com sucesso!" });
     }
