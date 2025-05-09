@@ -1,13 +1,21 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit'); // ⬅️ importar o middleware
 const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
-const authMiddleware = require('../middlewares/auth'); //alterar
+const authMiddleware = require('../middlewares/auth');
 
 // Middleware de autenticação
 router.use(authMiddleware);
 
-router.post('/infra-alert', async (req, res) => {
+// Rate limiter específico para /infra-alert
+const infraAlertLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuto
+  max: 10, // até 10 requisições por IP por minuto
+  message: { error: 'Muitas requisições. Tente novamente em breve.' }
+});
+
+router.post('/infra-alert', infraAlertLimiter, async (req, res) => {
   if (!isReady()) {
     logger.warn('Bot ainda não está pronto');
     return res.status(503).json({ error: "Bot ainda não está pronto." });
@@ -44,7 +52,5 @@ router.post('/infra-alert', async (req, res) => {
     return res.status(500).json({ error: "Erro interno." });
   }
 });
-
-
 
 module.exports = router;
