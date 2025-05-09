@@ -32,7 +32,7 @@ WORKDIR /app
 COPY . .
 
 # Instala dependências Node.js
-RUN npm install
+RUN npm install && npm install express-rate-limit
 
 # Expõe a porta da aplicação
 EXPOSE 3000
