@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
+const authMiddleware = require('../middlewares/auth'); //alterar
+
+// Middleware de autenticação
+router.use(authMiddleware);
 
 router.post('/infra-alert', async (req, res) => {
   if (!isReady()) {

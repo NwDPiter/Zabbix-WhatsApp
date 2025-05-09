@@ -25,6 +25,8 @@ services:
     image: latixa12/api:latest
     container_name: whatsapp-api
     networks: [web]
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - auth:/app/.wwebjs_auth   #
       - cache:/app/.wwebjs_cache #
@@ -39,6 +41,6 @@ services:
       - "traefik.http.services.whatsapp-api.loadbalancer.server.port=3000"
 
       # 🔐 Middleware basicAuth
-      - "traefik.http.routers.whatsapp-api.middlewares=basic-auth-apizap@docker"
-      - 'traefik.http.middlewares.basic-auth-apizap.basicauth.users=${BASIC_AUTH}'
+      #- "traefik.http.routers.whatsapp-api.middlewares=basic-auth-apizap@docker"
+      #- 'traefik.http.middlewares.basic-auth-apizap.basicauth.users=${BASIC_AUTH}'
 

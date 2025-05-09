@@ -1,6 +1,7 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 // Alvos
 const alvos = [
@@ -10,7 +11,20 @@ const alvos = [
 
 const estadoArquivo = path.join(__dirname, 'estado_com_auth.json');
 
-// Carregar e salvar estado
+// JWT
+const jwtSecret = process.env.JWT_SECRET; // use a mesma do backend
+const payload = { user: "infra-monitor" }; // você pode adicionar mais dados se quiser
+const token = jwt.sign(payload, jwtSecret, { expiresIn: "1h" });
+
+const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+};
+
+// URL do serviço de notificação
+const urlNotificacao = "https://SUA_URL/api/infra-alert";
+
+// Funções de estado
 function carregarEstado() {
     if (fs.existsSync(estadoArquivo)) {
         const raw = fs.readFileSync(estadoArquivo);
@@ -40,20 +54,6 @@ function salvarEstado(estado) {
     }
     fs.writeFileSync(estadoArquivo, JSON.stringify(salvar, null, 4));
 }
-
-// Autenticação
-const usuario = "SEU_USUARIO"; // Usuário do serviço de notificação
-const senha = "SEU_SENHA"; // Senha do serviço de notificação
-
-// Criação do cabeçalho de autenticação
-const auth = Buffer.from(`${usuario}:${senha}`).toString('base64');
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Basic ${auth}`
-};
-
-// URL do serviço de notificação
-const urlNotificacao = "NONE"; // https://SUA_URL/api/infra-alert || localhost:3000/api/infra-alert
 
 // Enviar notificação
 async function notificar(grupo, mensagem) {
@@ -85,15 +85,15 @@ async function verificar(estado) {
 
         if (online && !servico.online) {
             const minutos = Math.floor((agora - new Date(servico.inicio_falha)) / 60000);
-            const msg = `*Mensagem Automática* 📡\n\n*Serviço:* ${nome}\n*Status:* Voltou ao ar ✅\n*Hora:* ${agora.toLocaleString("pt-BR")}\n*Fora do ar por:* ${minutos} minutos`;
+            const msg = `📡 *Mensagem Automática* 📡\n\n*Serviço:* ${nome}\n*Status:* Voltou ao ar ✅\n*Hora:* ${agora.toLocaleString("pt-BR")}\n*Fora do ar por:* ${minutos} minutos`;
             await notificar(grupo, msg);
             servico.online = true;
             servico.inicio_falha = null;
         } else if (!online && servico.online) {
-            const msg = `*Mensagem Automática* 🚨\n\n*Serviço*: ${nome}\n*Status*: Fora do ar ⛔\n*Hora da Falha*: ${agora.toLocaleString("pt-BR")}`;
+            const msg = `🚨 *Mensagem Automática* 🚨\n\n*Serviço*: ${nome}\n*Status*: Fora do ar ⛔\n*Hora da Falha*: ${agora.toLocaleString("pt-BR")}`;
             await notificar(grupo, msg);
             servico.online = false;
-            servico.inicio_falha = agora; 
+            servico.inicio_falha = agora;
         }
     }
 
