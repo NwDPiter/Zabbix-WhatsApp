@@ -9,7 +9,7 @@ const app = express();
 const PORT = 3000;
 
 // 🔒 Ativa o trust proxy para capturar corretamente o IP real
-app.set('trust proxy', true);
+app.set('trust proxy','loopback', 1);
 
 app.use(express.json());
 app.use(logRequest);
