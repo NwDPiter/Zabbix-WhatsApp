@@ -17,7 +17,7 @@ function logRequest(req, res, next) {
 
       const timestamp = new Date().toLocaleString("pt-BR");
 
-      logger.info(`[${requestId}] ${timestamp} - ${req.method} ${req.originalUrl} ${res.statusCode} (${durationMs} ms) IP: ${ip}`);
+      logger.info(`${message} [${requestId}] ${timestamp} - ${req.method} ${req.originalUrl} ${res.statusCode} (${durationMs} ms) IP: ${ip}`);
       } catch (err) {
         console.error('Erro ao registrar log de requisição:', err);
       }
