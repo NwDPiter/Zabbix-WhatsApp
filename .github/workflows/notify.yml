@@ -14,7 +14,7 @@ jobs:
       - name: Enviar notificação para o webhook
         if: github.event.review.state == 'approved' || github.event.pull_request.merged == true
         env:
-          TOKEN: ${{ secrets.JWT_TOKEN }}                # Token JWT
+          TOKEN: ${{ secrets.JWT_TOKEN }}               # Token JWT
           URL: ${{ secrets.URL_API }}                   # URL da API 
           GROUP: ${{ secrets.GROUP }}                   # Nome do grupo WhatsApp
           EVENT_NAME: ${{ github.event_name }}
