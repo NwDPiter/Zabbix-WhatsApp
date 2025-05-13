@@ -1,14 +1,16 @@
-// geraToken.js
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
-const payload = {
-  userId: 1,
-  name: "Usuário Teste"
-};
+const secret = process.env.JWT_SECRET; // Use o mesmo segredo do auth.js
 
-const secret = "SEU_SECRET"; // Substitua pela sua real JWT_SECRET
+const token = jwt.sign(
+  {
+    userId: 1,
+    name: 'Client'
+  },
+  secret,
+  { expiresIn: '1h' }
+);
 
-const token = jwt.sign(payload, secret, { expiresIn: '1h' });
-
-console.log("Seu token JWT:");
+console.log('Token JWT válido:\n');
 console.log(token);
