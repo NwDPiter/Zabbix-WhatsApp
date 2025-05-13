@@ -11,13 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Enviar notificação para o webhook-
       - name: Enviar notificação para o webhook
         if: github.event.review.state == 'approved' || github.event.pull_request.merged == true
         env:
-          AUTH_HEADER: ${{ secrets.BASIC_AUTH_HEADER }} # Autenticação em base64
-          URL: ${{ secrets.URL_API }}                   # URL do seu servidor de webhook
-          GROUP: ${{ secrets.GROUP }}                   # Nome do grupo de WhatsApp
+          TOKEN: ${{ secrets.JWT_TOKEN }}                # Token JWT
+          URL: ${{ secrets.URL_API }}                   # URL da API protegida
+          GROUP: ${{ secrets.GROUP }}                   # Nome do grupo WhatsApp
           EVENT_NAME: ${{ github.event_name }}
           REVIEW_STATE: ${{ github.event.review.state || '' }}
           REVIEW_USER_LOGIN: ${{ github.event.review.user.login || '' }}
@@ -28,10 +27,10 @@ jobs:
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
           PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
           PR_MERGED: ${{ github.event.pull_request.merged }}
-        run: |         
+        run: |
           curl -X POST "$URL" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Basic $AUTH_HEADER" \
+            -H "Authorization: Bearer $TOKEN" \
             -H "x-github-event: $EVENT_NAME" \
             -d '{
               "group": "'"$GROUP"'",

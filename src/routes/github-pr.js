@@ -1,9 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
+const authMiddleware = require('../middlewares/auth'); 
 
-router.post('/github-notify', async (req, res) => {
+// Middleware de autenticação
+router.use(authMiddleware);
+
+// Rate limiter para a rota específica
+const githubNotifyLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuto
+  max: 6, // máximo de 6 requisições por IP
+  message: {
+    error: 'Muitas requisições. Tente novamente mais tarde.'
+  }
+});
+
+router.post('/github-notify', githubNotifyLimiter, async (req, res) => {
   const event = req.headers['x-github-event'];
   const payload = req.body;
   const groupName = payload.group;
@@ -21,21 +35,7 @@ router.post('/github-notify', async (req, res) => {
   let message = null;
 
   try {
-    // Evento: Revisão aprovada
-    if (event === 'pull_request_review' && payload.review?.state === 'approved') {
-      const pr = payload.pull_request || {};
-      const reviewer = payload.review?.user?.login || 'desconhecido';
-
-      message = `✅ *PR Aprovada!*
-👤 Autor: ${pr.user?.login || 'desconhecido'}
-✔️ Aprovada por: ${reviewer}
-📄 Título: ${pr.title || 'Sem título'}
-🌿 De: ${pr.head?.ref || '??'} → Para: ${pr.base?.ref || '??'}
-🔗 Link: ${pr.html_url || 'Sem URL'}`;
-    }
-
-    // Evento: PR fechada e mergeada
-    if (event === 'pull_request' && payload.pull_request?.merged === "true" || payload.pull_request?.merged === true) {
+    if (event === 'pull_request' && (payload.pull_request?.merged === "true" || payload.pull_request?.merged === true)) {
       const pr = payload.pull_request;
 
       message = `🎉 *PR Mergeada!*
@@ -56,15 +56,7 @@ router.post('/github-notify', async (req, res) => {
       }
 
       await client.sendMessage(targetGroup.id._serialized, message);
-      logger.info(`
--------------------------------------------
-Mensagem enviada:
-${message}
-Grupo: "${groupName}"
-Evento: ${event}
-Data/Hora: ${new Date().toLocaleString()}
--------------------------------------------
-`);
+      logger.info(`Mensagem enviada para o grupo "${groupName}":\n${message}`);
 
       return res.json({ success: true, message: "Mensagem enviada com sucesso!" });
     }
