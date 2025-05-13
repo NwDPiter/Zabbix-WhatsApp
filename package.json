@@ -4,7 +4,8 @@
     "main": "index.js",
     "scripts": {
         "start": "node src/server.js",
-        "monitor": "node src/scriptMonitoramento/monitor_com_auth.js"
+        "monitor": "node src/script/test-monitorar.js",
+        "pr": "node src/script/test-github.js"
     },
     "dependencies": {
         "axios": "^1.9.0",
