@@ -20,8 +20,9 @@
 .env
 
 # Ignora arquivos de estados
-/src/scripts/estado_sites.json 
+/src/scripts/estado_sites.json
+/src/scripts/scripts-testes/estado_sites.json
 
 # Testes
 /src/middlewares/auth-test.js
-/src/scripts/monitor-teste.js
+/src/scripts/scripts-testes

@@ -1,16 +1,9 @@
-require('dotenv').config();
+// gerar-token.js
 const jwt = require('jsonwebtoken');
 
-const secret = process.env.JWT_SECRET; // Use o mesmo segredo do auth.js
+const payload = { username: 'github-bot' };
+const secret = 'SEU_SECRET'; // mesma usada no backend
+const options = { expiresIn: '10y' }; 
 
-const token = jwt.sign(
-  {
-    userId: 1,
-    name: 'Client'
-  },
-  secret,
-  { expiresIn: '1h' }
-);
-
-console.log('Token JWT válido:\n');
+const token = jwt.sign(payload, secret, options);
 console.log(token);
