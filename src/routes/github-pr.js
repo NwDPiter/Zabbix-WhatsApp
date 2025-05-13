@@ -11,7 +11,7 @@ router.use(authMiddleware);
 // Rate limiter para a rota específica
 const githubNotifyLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minuto
-  max: 5, // máximo de 5 requisições por IP
+  max: 6, // máximo de 6 requisições por IP
   message: {
     error: 'Muitas requisições. Tente novamente mais tarde.'
   }
@@ -35,18 +35,6 @@ router.post('/github-notify', githubNotifyLimiter, async (req, res) => {
   let message = null;
 
   try {
-    if (event === 'pull_request_review' && payload.review?.state === 'approved') {
-      const pr = payload.pull_request || {};
-      const reviewer = payload.review?.user?.login || 'desconhecido';
-
-      message = `✅ *PR Aprovada!*
-👤 Autor: ${pr.user?.login || 'desconhecido'}
-✔️ Aprovada por: ${reviewer}
-📄 Título: ${pr.title || 'Sem título'}
-🌿 De: ${pr.head?.ref || '??'} → Para: ${pr.base?.ref || '??'}
-🔗 Link: ${pr.html_url || 'Sem URL'}`;
-    }
-
     if (event === 'pull_request' && (payload.pull_request?.merged === "true" || payload.pull_request?.merged === true)) {
       const pr = payload.pull_request;
 
@@ -68,7 +56,7 @@ router.post('/github-notify', githubNotifyLimiter, async (req, res) => {
       }
 
       await client.sendMessage(targetGroup.id._serialized, message);
-      logger.info(`Mensagem enviada para o grupo "${groupName}"`);
+      logger.info(`Mensagem enviada para o grupo "${groupName}":\n${message}`);
 
       return res.json({ success: true, message: "Mensagem enviada com sucesso!" });
     }

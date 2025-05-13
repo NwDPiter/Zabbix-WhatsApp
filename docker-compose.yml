@@ -40,7 +40,3 @@ services:
       - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
       - "traefik.http.services.whatsapp-api.loadbalancer.server.port=3000"
 
-      # 🔐 Middleware basicAuth
-      #- "traefik.http.routers.whatsapp-api.middlewares=basic-auth-apizap@docker"
-      #- 'traefik.http.middlewares.basic-auth-apizap.basicauth.users=${BASIC_AUTH}'
-

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const rateLimit = require('express-rate-limit'); // ⬅️ importar o middleware
+const rateLimit = require('express-rate-limit'); 
 const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
 const authMiddleware = require('../middlewares/auth');

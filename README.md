@@ -159,18 +159,18 @@ OBS: Caso exclua-os terá que autenticar novamente.
 ### Body JSON
 ```json
 {
-  "group": "Nome do Grupo",
-  "review": {
-    "state": "approved"
-  },
+  "group": "GRUPO",
   "pull_request": {
-    "title": "Título da Pull Request",
-    "html_url": "https://github.com/seu-repo/seu-projeto/pull/42",
+    "title": "TESTE",
+    "html_url": "https://github.com/org/repo/pull/456",
     "user": {
-      "login": "autor-da-pr"
+      "login": "dev456"
+    },
+    "merged_by": {
+      "login": "maintainer789"
     },
     "head": {
-      "ref": "feature/branch-origem"
+      "ref": "feature/TESTE"
     },
     "base": {
       "ref": "main"
@@ -188,33 +188,38 @@ OBS: Caso exclua-os terá que autenticar novamente.
 }
 ```
 
-### 💪 Exemplo de uso no GitHub Actions (workflow)
+### 💪 Exemplo de uso com curl
 ```yml
-- name: Enviar notificação para o WhatsApp
-  run: |
-    curl -X POST "${{ secrets.WEBHOOK_URL }}" \
-      -H "Content-Type: application/json" \
-      -H "x-github-event: ${{ github.event_name }}" \
-      -d '{
-        "group": "Time de Devs",
-        "review": {
-          "state": "${{ github.event.review.state || "" }}"
-        },
-        "pull_request": {
-          "title": "${{ github.event.pull_request.title }}",
-          "html_url": "${{ github.event.pull_request.html_url }}",
-          "user": {
-            "login": "${{ github.event.pull_request.user.login }}"
-          },
-          "head": {
-            "ref": "${{ github.event.pull_request.head.ref }}"
-          },
-          "base": {
-            "ref": "${{ github.event.pull_request.base.ref }}"
-          },
-          "merged": ${{ github.event.pull_request.merged || false }}
-        }
-      }'
+curl -X POST http://localhost:3000/api/infra-alert \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer SEU_TOKEN_JWT" \
+  -H "x-github-event: pull_request" \
+  -d '{
+    "group": "Time de Devs",
+    "review": {
+      "state": "approved",
+      "user": {
+        "login": "johndoe"
+      }
+    },
+    "pull_request": {
+      "title": "Melhoria no monitoramento",
+      "html_url": "https://github.com/usuario/repositorio/pull/42",
+      "user": {
+        "login": "janedoe"
+      },
+      "merged_by": {
+        "login": "admin"
+      },
+      "head": {
+        "ref": "feature/monitoramento"
+      },
+      "base": {
+        "ref": "main"
+      },
+      "merged": true
+    }
+  }'
 ```
 
 ## Utilização com cron (via curl)
@@ -224,11 +229,11 @@ OBS: Caso exclua-os terá que autenticar novamente.
 #!/bin/bash
 curl -X POST http://localhost:3000/api/infra-alert \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${SEU_TOKEN}" \
   -d '{"group": "Alertas Diários", "message": "Backup finalizado com sucesso."}'
 ```
 ## Agende o script utilizando o crontab:
-
-    crontab -e
+  crontab -e
 
 ## Adicione a seguinte linha para executar diariamente:
 ```perl
