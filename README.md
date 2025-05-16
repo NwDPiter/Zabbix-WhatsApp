@@ -61,8 +61,7 @@ services:
       - "traefik.http.routers.whatsapp-api.rule=Host(`suaurl.com`) && PathPrefix(`/send`)"
       - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
       - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
-      - "traefik.http.middlewares.auth.basicauth.users=usuario:senha_encriptada"
-      - "traefik.http.routers.whatsapp-api.middlewares=auth"
+      - "traefik.http.services.whatsapp-api.loadbalancer.server.port=3000"
     volumes:
       - ./.wwebjs_auth:/app/.wwebjs_auth
       - ./.wwebjs_cache:/app/.wwebjs_cache
@@ -74,32 +73,12 @@ networks:
     external: true
 
 ```
-> 🔐 Gere a senha com `htpasswd -nb admin senha` ou online em: https://bcrypt-generator.com/
-
-Retornado algo como:
-
-    `admin:$2y$05$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
-
-OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicione mais um "$", se não passar o docker vai entender como uma variável, fica assim:
-
-    `admin:$$2y$$05$$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
-  
-OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, inserindo as credenciais criptografadas em base64, no terminal linux, faça:
-
-```bash
-echo -n 'SEULogin:SUASenha' | base64
-```
-
-Vai retornar algo como:
-```
-YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
-```
 
 Exemplo de requisição:
-```bash
+```yml
 curl -X POST http://localhost:3000/api/infra-alert \
   -H "Content-Type: application/json" \
-  -H "Authorization: Basic YWRtaW46bWluaGFTZW5oYTEyMw==" \
+  -H "Authorization: Bearer SEU_TOKEN_JWT \
   -d '{
     "group": "API",
     "message": "Olá, isso é um teste automatizado 🚀😊"
