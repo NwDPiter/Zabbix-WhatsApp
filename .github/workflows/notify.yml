@@ -2,31 +2,27 @@ name: Notificar Status da PR
 
 on:
   pull_request:
-    types: [closed]
-  pull_request_review:
-    types: [submitted]
+    types: [opened, closed]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Enviar notificação para o webhook
-        if: github.event.review.state == 'approved' || github.event.pull_request.merged == true
+      - name: Enviar notificação apenas se PR foi aberta ou mergeada
+        if: github.event.action == 'opened' || github.event.pull_request.merged == true
         env:
-          TOKEN: ${{ secrets.JWT_TOKEN }}               # Token JWT
-          URL: ${{ secrets.URL_API }}                   # URL da API 
-          GROUP: ${{ secrets.GROUP }}                   # Nome do grupo WhatsApp
+          TOKEN: ${{ secrets.JWT_TOKEN }}
+          URL: ${{ secrets.URL_API }}
+          GROUP: ${{ secrets.GROUP }}
           EVENT_NAME: ${{ github.event_name }}
-          REVIEW_STATE: ${{ github.event.review.state || '' }}
-          REVIEW_USER_LOGIN: ${{ github.event.review.user.login || '' }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_HTML_URL: ${{ github.event.pull_request.html_url }}
-          PR_USER_LOGIN: ${{ github.event.pull_request.user.login }}
+          PR_TITLE: ${{ github.event.pull_request.title || '' }}
+          PR_HTML_URL: ${{ github.event.pull_request.html_url || '' }}
+          PR_USER_LOGIN: ${{ github.event.pull_request.user.login || '' }}
           PR_MERGED_BY_LOGIN: ${{ github.event.pull_request.merged_by.login || '' }}
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
-          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
-          PR_MERGED: ${{ github.event.pull_request.merged }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref || '' }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref || '' }}
+          PR_MERGED: ${{ github.event.pull_request.merged || false }}
         run: |
           curl -X POST "$URL" \
             -H "Content-Type: application/json" \
@@ -34,12 +30,6 @@ jobs:
             -H "x-github-event: $EVENT_NAME" \
             -d '{
               "group": "'"$GROUP"'",
-              "review": {
-                "state": "'"$REVIEW_STATE"'",
-                "user": {
-                  "login": "'"$REVIEW_USER_LOGIN"'"
-                }
-              },
               "pull_request": {
                 "title": "'"$PR_TITLE"'",
                 "html_url": "'"$PR_HTML_URL"'",
