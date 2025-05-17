@@ -3,9 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "start": "node src/server.js",
-        "monitor": "node src/script/test-monitorar.js",
-        "pr": "node src/script/test-github.js"
+        "start": "node src/server.js"
     },
     "dependencies": {
         "axios": "^1.9.0",
