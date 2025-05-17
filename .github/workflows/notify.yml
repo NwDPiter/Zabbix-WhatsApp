@@ -47,7 +47,7 @@ jobs:
                 "base": {
                   "ref": "'"$PR_BASE_REF"'"
                 },
-                "merged": "'"$PR_MERGED"'"
+                "merged": '$PR_MERGED'
               }
             }'
 
@@ -79,6 +79,6 @@ jobs:
                 "base": {
                   "ref": "'"$PR_BASE_REF"'"
                 },
-                "merged": "'"$PR_MERGED"'"
+                "merged": '$PR_MERGED'
               }
             }'
