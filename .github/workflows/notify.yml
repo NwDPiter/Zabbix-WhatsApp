@@ -16,6 +16,7 @@ jobs:
           URL: ${{ secrets.URL_API }}
           GROUP: ${{ secrets.GROUP }}
           EVENT_NAME: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
           PR_TITLE: ${{ github.event.pull_request.title || '' }}
           PR_HTML_URL: ${{ github.event.pull_request.html_url || '' }}
           PR_USER_LOGIN: ${{ github.event.pull_request.user.login || '' }}
@@ -30,6 +31,7 @@ jobs:
             -H "x-github-event: $EVENT_NAME" \
             -d '{
               "group": "'"$GROUP"'",
+              "action": "'"$ACTION"'",
               "pull_request": {
                 "title": "'"$PR_TITLE"'",
                 "html_url": "'"$PR_HTML_URL"'",
