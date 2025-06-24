@@ -61,7 +61,6 @@ services:
       - "traefik.http.routers.whatsapp-api.rule=Host(`suaurl.com`) && PathPrefix(`/send`)"
       - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
       - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
-      - "traefik.http.middlewares.auth.basicauth.users=usuario:senha_encriptada"
       - "traefik.http.routers.whatsapp-api.middlewares=auth"
     volumes:
       - ./.wwebjs_auth:/app/.wwebjs_auth
