@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, closed]
 
-env: # <-- ENV GLOBAL (válido para todos os jobs e steps)
+env: 
   TOKEN: ${{ secrets.JWT_TOKEN }}
   URL: ${{ secrets.URL_API }}
   GROUP: ${{ secrets.GROUP }}
