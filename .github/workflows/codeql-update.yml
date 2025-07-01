@@ -57,12 +57,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker tag variables
-        id: vars
-        run: |
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
-
       - name: Log in to Docker Registry
         uses: docker/login-action@v3
         with:
@@ -75,14 +69,17 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/api:latest
-            ${{ secrets.DOCKER_USERNAME }}/api:${{ steps.vars.outputs.short_sha }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/api:latest
 
       - name: Esperando...
         run: |
           echo "Aguardando imagem chegar ao docker hub..."
           sleep 12
-
+          
+  Update-environment:
+    needs: Push-to-DockerHub
+    name: Update-environment
+    runs-on: ubuntu-latest  
+    steps:
       - name: Atualizando ambiente de produção
         run: curl --location --request POST ${{ secrets.URL_UPDATE_PORTAINER }}
