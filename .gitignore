@@ -6,9 +6,11 @@
 
 # Ignora a pasta de autenticação do WhatsApp Web
 /.wwebjs_auth/
+/src\scripts\.wwebjs_auth
 
 # Ignora a pasta de cache do WhatsApp Web
 /.wwebjs_cache/
+/src\scripts\.wwebjs_auth
 
 # Ignora arquivos de sistema específicos do editor
 .DS_Store
@@ -25,4 +27,4 @@
 
 # Testes
 /src/middlewares/auth-test.js
-/src/scripts/scripts-testes
+/src/scripts/scripts-testes/
