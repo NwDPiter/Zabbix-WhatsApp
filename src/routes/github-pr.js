@@ -18,7 +18,7 @@ const githubNotifyLimiter = rateLimit({
 });
 
 router.post('/github-notify', githubNotifyLimiter, async (req, res) => {
-  const event = req.headers['x-github-event'];
+  const event = req.headers['x-github-event'] || req.headers['x-gitlab-event'];
   const payload = req.body;
   const groupName = payload.group;
 
