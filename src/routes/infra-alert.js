@@ -29,6 +29,7 @@ router.post('/infra-alert', infraAlertLimiter, async (req, res) => {
   }
 
   try {
+    await client.sendPresenceAvailable(); // Garante que o cliente está disponível para enviar mensagens
     const chats = await client.getChats();
     const targetGroup = chats.find(chat => chat.isGroup && chat.name === group);
 

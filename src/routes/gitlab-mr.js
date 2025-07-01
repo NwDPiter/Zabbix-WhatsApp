@@ -8,7 +8,7 @@ const authMiddleware = require('../middlewares/auth');
 // Middleware de autenticação
 router.use(authMiddleware);
 
-// Limitador de requisições
+// Rate limiter para evitar flood
 const gitlabNotifyLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 6,
@@ -39,6 +39,7 @@ router.post('/gitlab-notify', gitlabNotifyLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Parâmetro "event" e objeto "merge_request" são obrigatórios.' });
   }
 
+  // Monta a mensagem
   let message = null;
 
   if (event === 'opened') {
@@ -58,12 +59,14 @@ router.post('/gitlab-notify', gitlabNotifyLimiter, async (req, res) => {
 🔗 Link: ${mr.url || 'Sem link'}`;
   }
 
+  // Nenhum evento relevante
   if (!message) {
     logger.info('Evento ignorado: sem mensagem gerada.');
     return res.status(200).json({ message: 'Evento ignorado.' });
   }
 
   try {
+    await client.sendPresenceAvailable(); // Garante que o cliente está disponível para enviar mensagens
     const chats = await client.getChats();
     const targetGroup = chats.find(c => c.isGroup && c.name === groupName);
 
@@ -77,19 +80,28 @@ router.post('/gitlab-notify', gitlabNotifyLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Mensagem inválida. Verifique o conteúdo enviado.' });
     }
 
-    await client.sendMessage(targetGroup.id._serialized, message);
-    logger.info(`Mensagem enviada para "${groupName}": ${message}`);
-    return res.json({ success: true, message: 'Mensagem enviada com sucesso!' });
+    // Envia mensagem com proteção contra erro de serialização
+    try {
+      await client.sendMessage(targetGroup.id._serialized, message);
+      logger.info(`Mensagem enviada para "${groupName}": ${message}`);
+      return res.json({ success: true, message: 'Mensagem enviada com sucesso!' });
+    } catch (sendError) {
+      if (sendError.message?.includes('serialize')) {
+        logger.warn(`Mensagem enviada, mas erro ao serializar resposta do WhatsApp: ${sendError.message}`);
+        return res.status(207).json({
+          warning: true,
+          message: 'Mensagem possivelmente enviada, mas ocorreu erro de serialização ao processar o retorno.'
+        });
+      }
+
+      // Outros erros não previstos
+      throw sendError;
+    }
 
   } catch (error) {
     if (error.message?.includes('getChats')) {
       logger.error('Erro ao listar chats:', error);
       return res.status(502).json({ error: 'Erro ao acessar WhatsApp Web.' });
-    }
-
-    if (error.message?.includes('serialize')) {
-      logger.error('Erro de serialização: possível problema de contexto com o grupo ou WhatsApp');
-      return res.status(500).json({ error: 'Falha interna ao enviar a mensagem (serialize).' });
     }
 
     logger.error('Erro inesperado ao enviar mensagem:', error);
