@@ -27,6 +27,11 @@ services:
     networks: [web]
     environment:
       - JWT_SECRET=${JWT_SECRET}
+      - WHATSAPP_GROUP_A=${WHATSAPP_GROUP_A}
+      - WHATSAPP_GROUP_B=${WHATSAPP_GROUP_B}
+      - WHATSAPP_GROUP_C=${WHATSAPP_GROUP_C}
+      - WHATSAPP_GROUP_D=${WHATSAPP_GROUP_D}
+      - WHATSAPP_GROUP_E=${WHATSAPP_GROUP_E}
     volumes:
       - auth:/app/.wwebjs_auth   #
       - cache:/app/.wwebjs_cache #
