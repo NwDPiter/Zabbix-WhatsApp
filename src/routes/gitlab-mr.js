@@ -66,6 +66,7 @@ router.post('/gitlab-notify', gitlabNotifyLimiter, async (req, res) => {
   }
 
   try {
+    await client.sendPresenceAvailable(); // Garante que o cliente está disponível para enviar mensagens
     const chats = await client.getChats();
     const targetGroup = chats.find(c => c.isGroup && c.name === groupName);
 

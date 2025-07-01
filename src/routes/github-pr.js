@@ -59,6 +59,7 @@ router.post('/github-notify', githubNotifyLimiter, async (req, res) => {
     }
 
     if (message) {
+      await client.sendPresenceAvailable(); // Garante que o cliente está disponível para enviar mensagens
       const chats = await client.getChats();
       const targetGroup = chats.find(chat => chat.isGroup && chat.name === groupName);
 
