@@ -3,6 +3,7 @@ const logger = require('./config/logger');
 const { client } = require('./services/whatsappClient');
 const sendIfraAlert = require('./routes/infra-alert');
 const sendStatusPr = require('./routes/github-pr');
+const sendGitlabMr = require('./routes/gitlab-mr');
 const logRequest = require('./middlewares/logRequest');
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(logRequest);
 
 // Rotas
+app.use('/api', sendGitlabMr);
 app.use('/api', sendIfraAlert);
 app.use('/api', sendStatusPr);
 
