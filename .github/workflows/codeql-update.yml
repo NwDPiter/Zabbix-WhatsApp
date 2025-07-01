@@ -75,6 +75,11 @@ jobs:
         run: |
           echo "Aguardando imagem chegar ao docker hub..."
           sleep 12
-
+          
+  Update-environment:
+    needs: Push-to-DockerHub
+    name: Update-environment
+    runs-on: ubuntu-latest  
+    steps:
       - name: Atualizando ambiente de produção
         run: curl --location --request POST ${{ secrets.URL_UPDATE_PORTAINER }}
