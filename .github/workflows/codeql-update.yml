@@ -83,3 +83,4 @@ jobs:
     steps:
       - name: Atualizando ambiente de produção
         run: curl -X POST ${{ secrets.URL_UPDATE_PORTAINER }}
+

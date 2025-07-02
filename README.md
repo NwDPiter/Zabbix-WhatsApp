@@ -86,6 +86,8 @@ services:
       - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
       - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
       - "traefik.http.services.whatsapp-api.loadbalancer.server.port=3000"
+      - "traefik.http.routers.whatsapp-api.middlewares=auth"
+
     volumes:
       - ./.wwebjs_auth:/app/.wwebjs_auth
       - ./.wwebjs_cache:/app/.wwebjs_cache
