@@ -2,7 +2,7 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [main, dev]
+    branches: [dev]
 
 jobs:
   analyze:
@@ -82,4 +82,5 @@ jobs:
     runs-on: ubuntu-latest  
     steps:
       - name: Atualizando ambiente de produção
-        run: curl --location --request POST ${{ secrets.URL_UPDATE_PORTAINER }}
+        run: curl -X POST ${{ secrets.URL_UPDATE_PORTAINER }}
+

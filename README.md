@@ -1,26 +1,36 @@
 # 📦 WhatsApp Alert Bot
 
-Este projeto permite enviar alertas automaticamente para grupos do WhatsApp usando a biblioteca [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js). Ele pode ser integrado ao Zabbix e Github via webhook ou usado em scripts agendados com `cron`.
+Projeto que envia alertas automaticamente para grupos do WhatsApp usando [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js).  
+Compatível com GitHub, GitLab, Zabbix e agendamentos via `cron`.
 
-## 🚀 O que o projeto automatiza?
-- Recebe requisições HTTP/HTTPS
+---
 
-  - Com alertas do Zabbix (via webhook).
-  - Com informções sobre PRs do Github (via webhook).
+## 🚀 O que ele automatiza?
 
-- Pode ser chamado via `curl` em scripts executados por `cron`.
-- Localiza o grupo do WhatsApp configurado.
-- Envia a mensagem de alerta automaticamente.
+- 🔔 Recebe alertas via Webhook:
+  - PRs do **GitHub**
+  - MRs do **GitLab**
+  - Alertas do **Zabbix**
+- 🕰️ Suporte a scripts agendados (`cron`)
+- 📤 Envio automático para grupos do WhatsApp definidos via `.env`
+
+---
 
 ## 🛠 Requisitos
-- Node.js 18+ (para rodar localmente)
-- Conta do WhatsApp válida
-- Docker (recomendado)
-- Zabbix configurado com webhook (opcional)
-- Cron (opcional, para agendamentos)
-- Traefik (opcional para exposição segura com autenticação)
+
+| Recurso          | Uso                                                  |
+|------------------|-------------------------------------------------------|
+| Node.js 18+      | Para desenvolvimento local                            |
+| Docker           | Execução recomendada em produção                      |
+| Conta WhatsApp   | Vinculação via QR code                                |
+| Zabbix           | Opcional para integrações de monitoramento            |
+| GitHub / GitLab  | Para integração com webhooks                          |
+| Traefik (opcional) | Reverso e autenticação básica via JWT               |
+
+---
 
 ## 📁 Clonando o projeto
+
 ```bash
 git clone https://github.com/NwDPiter/Zabbix-WhatsApp.git
 cd Zabbix-WhatsApp
@@ -42,6 +52,13 @@ services:
   whatsapp-api:
     image: latixa12/api
     container_name: whatsapp-api
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - WHATSAPP_GROUP_A=${WHATSAPP_GROUP_A}
+      - WHATSAPP_GROUP_B=${WHATSAPP_GROUP_B}
+      - WHATSAPP_GROUP_C=${WHATSAPP_GROUP_C}
+      - WHATSAPP_GROUP_D=${WHATSAPP_GROUP_D}
+      - WHATSAPP_GROUP_E=${WHATSAPP_GROUP_E}
     volumes:
       - ./.wwebjs_auth:/app/.wwebjs_auth
       - ./.wwebjs_cache:/app/.wwebjs_cache
@@ -56,12 +73,21 @@ services:
   whatsapp-api:
     image: latixa12/api
     container_name: whatsapp-api
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - WHATSAPP_GROUP_A=${WHATSAPP_GROUP_A}
+      - WHATSAPP_GROUP_B=${WHATSAPP_GROUP_B}
+      - WHATSAPP_GROUP_C=${WHATSAPP_GROUP_C}
+      - WHATSAPP_GROUP_D=${WHATSAPP_GROUP_D}
+      - WHATSAPP_GROUP_E=${WHATSAPP_GROUP_E}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whatsapp-api.rule=Host(`suaurl.com`) && PathPrefix(`/send`)"
       - "traefik.http.routers.whatsapp-api.entrypoints=websecure"
       - "traefik.http.routers.whatsapp-api.tls.certresolver=le"
+      - "traefik.http.services.whatsapp-api.loadbalancer.server.port=3000"
       - "traefik.http.routers.whatsapp-api.middlewares=auth"
+
     volumes:
       - ./.wwebjs_auth:/app/.wwebjs_auth
       - ./.wwebjs_cache:/app/.wwebjs_cache
@@ -73,39 +99,10 @@ networks:
     external: true
 
 ```
-> 🔐 Gere a senha com `htpasswd -nb admin senha` ou online em: https://bcrypt-generator.com/
 
-Retornado algo como:
+## 📸 Autenticação via WhatsApp
 
-    `admin:$2y$05$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
-
-OBS: Caso passe esse valor nas envs do poratiner ou diretamente no docker adicione mais um "$", se não passar o docker vai entender como uma variável, fica assim:
-
-    `admin:$$2y$$05$$eEr3H9ZkEWiRp1Ab7Zd7t.hJzEHFYEXAMPLEBCRYPTd8RZrcXgzIQT7xW`
-  
-OBS: No uso de auth será obrigatório alterar o cabeçalho da requisição, inserindo as credenciais criptografadas em base64, no terminal linux, faça:
-
-```bash
-echo -n 'SEULogin:SUASenha' | base64
-```
-
-Vai retornar algo como:
-```
-YWRtaW46bWluaGFTZW5oYVNlZ3VyYQ==
-```
-
-Exemplo de requisição:
-```bash
-curl -X POST http://localhost:3000/api/infra-alert \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Basic YWRtaW46bWluaGFTZW5oYTEyMw==" \
-  -d '{
-    "group": "API",
-    "message": "Olá, isso é um teste automatizado 🚀😊"
-}'
-```
-
-## Quando subir a 1º essa aplicação, será necessário autenticar seu WhatsApp via QR que vai aparecer no teminal:
+## Quando subir a 1º vez essa aplicação, será necessário autenticar seu WhatsApp via QR que vai aparecer no teminal:
 
 ![alt text](/doc/QR.png)
 
@@ -121,18 +118,18 @@ curl -X POST http://localhost:3000/api/infra-alert \
  - .wwebjs_auth
  - .wwebjs_cache
    
-OBS: Caso exclua-os terá que autenticar novamente.
+🔒 OBS: Se apagados, a autenticação será necessária novamente.
 
 ## 📬 Endpoints da API
 
 ### 📍Rota
-`POST /infra-alert`
+`POST /api/infra-alert`
 
 ### 📤 Body JSON
 ```json
 {
-  "group": "Nome do Grupo",
-  "message": "Mensagem de alerta do Zabbix"
+  "group": "a",
+  "message": "Serviço X está fora do ar 🚨"
 }
 ```
 
@@ -144,32 +141,24 @@ OBS: Caso exclua-os terá que autenticar novamente.
 }
 ```
 
-### Exemplo de input no Zabbix (via webhook personalizado)
-```json
-{
-  "group": "Alertas Zabbix",
-  "message": "{HOST.NAME} está com problema: {TRIGGER.NAME}"
-}
-```
-
 ### 📍Rota
-`POST /github-notify`
+`POST /api/github-notify`
 
 ### Body JSON
 ```json
 {
-  "group": "GRUPO",
+  "group": "b",
   "pull_request": {
-    "title": "TESTE",
-    "html_url": "https://github.com/org/repo/pull/456",
+    "title": "Nova feature finalizada",
+    "html_url": "https://github.com/org/repos/pull/101",
     "user": {
-      "login": "dev456"
+      "login": "pedro-dev"
     },
     "merged_by": {
-      "login": "maintainer789"
+      "login": "maintainer123"
     },
     "head": {
-      "ref": "feature/TESTE"
+      "ref": "feature/nova"
     },
     "base": {
       "ref": "main"
@@ -179,64 +168,69 @@ OBS: Caso exclua-os terá que autenticar novamente.
 }
 ```
 
-### ✅ Exemplo de resposta
+### 📩 Mensagem gerada:
+```json
+🎉 PR Mergeada!
+👤 Autor: pedro-dev
+🔁 Mergeado por: maintainer123
+📄 Título: Feature: envio de alertas
+🔗 Link: https://github.com/org/repos/pull/101
+```
+
+### 📍Rota
+`POST /api/gitlab-notify`
+
+### Body JSON
 ```json
 {
-  "success": true,
-  "message": "Mensagem enviada com sucesso!"
+  "group": "c",
+  "event": "merged",
+  "merge_request": {
+    "title": "Hotfix: pipeline de produção",
+    "user": { "username": "ci-runner" },
+    "merged_by": { "username": "admin" },
+    "url": "https://gitlab.com/org/repo/-/merge_requests/42",
+    "merged": true
+  }
 }
 ```
 
-### 💪 Exemplo de uso com curl
-```yml
-curl -X POST http://localhost:3000/api/infra-alert \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer SEU_TOKEN_JWT" \
-  -H "x-github-event: pull_request" \
-  -d '{
-    "group": "Time de Devs",
-    "review": {
-      "state": "approved",
-      "user": {
-        "login": "johndoe"
-      }
-    },
-    "pull_request": {
-      "title": "Melhoria no monitoramento",
-      "html_url": "https://github.com/usuario/repositorio/pull/42",
-      "user": {
-        "login": "janedoe"
-      },
-      "merged_by": {
-        "login": "admin"
-      },
-      "head": {
-        "ref": "feature/monitoramento"
-      },
-      "base": {
-        "ref": "main"
-      },
-      "merged": true
-    }
-  }'
+### 📩 Mensagem gerada:
+```json
+🎉 Merge Concluído!
+👤 Autor: ci-runner
+🔁 Mergeado por: admin
+📄 Título: Hotfix: pipeline de produção
+🔗 Link: https://gitlab.com/org/repo/-/merge_requests/42
 ```
 
-## Utilização com cron (via curl)
-### Crie um script bash para enviar mensagens agendadas:
+### 🔐 Como funcionam os grupos via .env?
+
+Em vez de escrever o nome do grupo no JSON, você usa uma letra identificadora (como "a", "b", "c") e define o ID real no .env:
+
+WHATSAPP_GROUP_A=1203xxxx@g.us # Grupo A
+
+WHATSAPP_GROUP_B=1203yyyy@g.us # Equipe Devs
+
+WHATSAPP_GROUP_C=1203zzzz@g.us # Pipeline GitLab
+
+
+## ⏰ Agendando com Cron monitoramento de infra
+### Script exemplo:
 
 ```yml
 #!/bin/bash
 curl -X POST http://localhost:3000/api/infra-alert \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${SEU_TOKEN}" \
-  -d '{"group": "Alertas Diários", "message": "Backup finalizado com sucesso."}'
+  -d '{"group": "a", "message": "Backup finalizado com sucesso ✅"}'
 ```
 ## Agende o script utilizando o crontab:
   crontab -e
 
 ## Adicione a seguinte linha para executar diariamente:
 ```perl
-0 1 * * * /caminho/para/o/script.sh
+0 1 * * * /caminho/para/seu/script.sh
 ```
 
 ## ✨ Contribuições

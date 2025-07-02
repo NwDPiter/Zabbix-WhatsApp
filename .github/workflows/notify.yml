@@ -2,31 +2,28 @@ name: Notificar Status da PR
 
 on:
   pull_request:
-    types: [closed]
-  pull_request_review:
-    types: [submitted]
+    types: [opened, closed]
+
+env: 
+  TOKEN: ${{ secrets.JWT_TOKEN }}
+  URL: ${{ secrets.URL_API }}
+  GROUP: ${{ secrets.GROUP }}
+  EVENT_NAME: ${{ github.event_name }}
+  ACTION: ${{ github.event.action }}
+  PR_TITLE: ${{ github.event.pull_request.title || '' }}
+  PR_HTML_URL: ${{ github.event.pull_request.html_url || '' }}
+  PR_USER_LOGIN: ${{ github.event.pull_request.user.login || '' }}
+  PR_MERGED_BY_LOGIN: ${{ github.event.pull_request.merged_by.login || '' }}
+  PR_HEAD_REF: ${{ github.event.pull_request.head.ref || '' }}
+  PR_BASE_REF: ${{ github.event.pull_request.base.ref || '' }}
+  PR_MERGED: ${{ github.event.pull_request.merged || false }}
 
 jobs:
-  notify:
+  notify_opened:
+    if: github.event.action == 'opened'
     runs-on: ubuntu-latest
-
     steps:
-      - name: Enviar notificação para o webhook
-        if: github.event.review.state == 'approved' || github.event.pull_request.merged == true
-        env:
-          TOKEN: ${{ secrets.JWT_TOKEN }}               # Token JWT
-          URL: ${{ secrets.URL_API }}                   # URL da API 
-          GROUP: ${{ secrets.GROUP }}                   # Nome do grupo WhatsApp
-          EVENT_NAME: ${{ github.event_name }}
-          REVIEW_STATE: ${{ github.event.review.state || '' }}
-          REVIEW_USER_LOGIN: ${{ github.event.review.user.login || '' }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_HTML_URL: ${{ github.event.pull_request.html_url }}
-          PR_USER_LOGIN: ${{ github.event.pull_request.user.login }}
-          PR_MERGED_BY_LOGIN: ${{ github.event.pull_request.merged_by.login || '' }}
-          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
-          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
-          PR_MERGED: ${{ github.event.pull_request.merged }}
+      - name: Notificar PR aberta
         run: |
           curl -X POST "$URL" \
             -H "Content-Type: application/json" \
@@ -34,12 +31,7 @@ jobs:
             -H "x-github-event: $EVENT_NAME" \
             -d '{
               "group": "'"$GROUP"'",
-              "review": {
-                "state": "'"$REVIEW_STATE"'",
-                "user": {
-                  "login": "'"$REVIEW_USER_LOGIN"'"
-                }
-              },
+              "action": "'"$ACTION"'",
               "pull_request": {
                 "title": "'"$PR_TITLE"'",
                 "html_url": "'"$PR_HTML_URL"'",
@@ -55,6 +47,38 @@ jobs:
                 "base": {
                   "ref": "'"$PR_BASE_REF"'"
                 },
-                "merged": "'"$PR_MERGED"'"
+                "merged": '$PR_MERGED'
+              }
+            }'
+
+  notify_merged:
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notificar PR mergeada
+        run: |
+          curl -X POST "$URL" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "x-github-event: $EVENT_NAME" \
+            -d '{
+              "group": "'"$GROUP"'",
+              "action": "'"$ACTION"'",
+              "pull_request": {
+                "title": "'"$PR_TITLE"'",
+                "html_url": "'"$PR_HTML_URL"'",
+                "user": {
+                  "login": "'"$PR_USER_LOGIN"'"
+                },
+                "merged_by": {
+                  "login": "'"$PR_MERGED_BY_LOGIN"'"
+                },
+                "head": {
+                  "ref": "'"$PR_HEAD_REF"'"
+                },
+                "base": {
+                  "ref": "'"$PR_BASE_REF"'"
+                },
+                "merged": '$PR_MERGED'
               }
             }'
