@@ -204,23 +204,6 @@ networks:
 🔗 Link: https://gitlab.com/org/repo/-/merge_requests/42
 ```
 ---
-### Exemplo de .env
-
-JWT_SECRET=SUA_SENHA
-
-DEVICE=/local/backup # Armazena o login para não ter que autenticar novamente
-
-WHATSAPP_GROUP_A=1203xxxx@g.us # Grupo A          
-
-WHATSAPP_GROUP_B=1203yyyy@g.us # Equipe Devs
-
-WHATSAPP_GROUP_C=1203zzzz@g.us # Pipeline GitLab
-
-WHATSAPP_GROUP_D=1234@vazio
-
-WHATSAPP_GROUP_E=1234@vazio
-
-
 ### 🔐 Como funcionam os grupos via .env?
 
 Em vez de escrever o nome do grupo no JSON, você usa uma letra identificadora (como "a", "b", "c") e define o ID real no .env:
@@ -239,6 +222,25 @@ EX:
   
     req(c) -> .env(HATSAPP_GROUP_C=1203zzzz@g.us # Pipeline GitLab)
 
+### 📌 Come pegar o id do grupo?
+
+Já deixei um script pronto para isso: "src/scripts/listar-grupos.js"
+
+  1. Conecta sua conta do WhatsApp via QR Code
+  2. Vai listar todos os grupos dos quais você participa
+  3. Exibe o nome do grupo e o ID necessário para o .env
+
+### ✅ Exemplo de saída:
+
+    • Equipe DevOps → 1203yyyy@g.us
+    • Alertas Zabbix → 1203zzzz@g.us
+
+### Copie o ID desejado e adicione ao seu .env:
+
+    WHATSAPP_GROUP_B=1203yyyy@g.us # Equipe DevOps
+    WHATSAPP_GROUP_C=1203zzzz@g.us # Alertas Zabbix
+  
+
 ## ⏰ Agendando com Cron monitoramento de infra
 ### Script exemplo:
 
@@ -256,6 +258,22 @@ curl -X POST http://localhost:3000/api/infra-alert \
 ```perl
 0 1 * * * /caminho/para/seu/script.sh
 ```
+
+### Exemplo de .env
+
+JWT_SECRET=SUA_SENHA # O code gerará um token com essa senha
+
+DEVICE=/local/backup # Armazena o login para não ter que autenticar novamente
+
+WHATSAPP_GROUP_A=1203xxxx@g.us # Grupo A          
+
+WHATSAPP_GROUP_B=1203yyyy@g.us # Equipe Devs
+
+WHATSAPP_GROUP_C=1203zzzz@g.us # Pipeline GitLab
+
+WHATSAPP_GROUP_D=1234@vazio    # Vago
+
+WHATSAPP_GROUP_E=1234@vazio    # Vago
 
 ## ✨ Contribuições
 Sinta-se livre para abrir issues, PRs ou ideias no repositório: [https://github.com/NwDPiter/whatsapp_alert_bot_api.git](https://github.com/NwDPiter/whatsapp_alert_bot_api.git)
