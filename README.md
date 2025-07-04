@@ -140,11 +140,45 @@ networks:
   "message": "Mensagem enviada com sucesso!"
 }
 ```
+---
 
 ### 📍Rota
 `POST /api/github-notify`
 
-### Body JSON
+### Body JSON `OPEN`
+```json
+{
+  "group": "e",
+  "action": "opened",
+  "pull_request": {
+    "title": "Nova feature de notificação",
+    "user": {
+      "login": "pedro-dev"
+    },
+    "html_url": "https://github.com/sua-org/seu-repo/pull/42",
+    "base": {
+      "ref": "main"
+    },
+    "head": {
+      "ref": "feature/notificacao"
+    }
+  }
+}
+
+```
+
+### 📩 Mensagem gerada:
+
+    🚀 Nova Pull Request Aberta!
+    👤 Autor: pedro-dev
+    📄 Título: Nova feature de notificação
+    🌿 De: feature/notificacao → Para: main
+    🔗 Link: https://github.com/sua-org/seu-repo/pull/42 
+
+
+
+
+### Body JSON `MERGE`
 ```json
 {
   "group": "b",
@@ -169,18 +203,45 @@ networks:
 ```
 
 ### 📩 Mensagem gerada:
-```json
-🎉 PR Mergeada!
-👤 Autor: pedro-dev
-🔁 Mergeado por: maintainer123
-📄 Título: Feature: envio de alertas
-🔗 Link: https://github.com/org/repos/pull/101
-```
+
+    🎉 PR Mergeada!
+    👤 Autor: pedro-dev
+    🔁 Mergeado por: maintainer123
+    📄 Título: Feature: envio de alertas
+    🔗 Link: https://github.com/org/repos/pull/101
+
+---
 
 ### 📍Rota
 `POST /api/gitlab-notify`
 
-### Body JSON
+### Body JSON `OPEN`
+```json
+{
+  "group": "e",
+  "event": "opened",
+  "merge_request": {
+    "title": "Hotfix: pipeline de produção",
+    "user": {
+      "username": "ci-runner"
+    },
+    "source_branch": "oi",
+    "target_branch": "teste",
+    "url": "https://gitlab.com/org/repo/-/merge_requests/42",
+    "merged": false
+  }
+}
+```
+
+### 📩 Mensagem gerada:
+
+    🚀 Merge Request Aberta!
+    👤 Autor: Pedro_Sales
+    📄 Título: Hotfix: pipeline de produção
+    🌱 De: deploy → Para: master
+    🔗 Link: https://gitlab.com/nwdpiter-group/NwDPiter-project/-/merge_requests/18 
+
+### Body JSON `MERGE`
 ```json
 {
   "group": "c",
@@ -196,13 +257,13 @@ networks:
 ```
 
 ### 📩 Mensagem gerada:
-```json
-🎉 Merge Concluído!
-👤 Autor: ci-runner
-🔁 Mergeado por: admin
-📄 Título: Hotfix: pipeline de produção
-🔗 Link: https://gitlab.com/org/repo/-/merge_requests/42
-```
+
+    🎉 Merge Concluído!
+    👤 Autor: ci-runner
+    🔁 Mergeado por: admin
+    📄 Título: Hotfix: pipeline de produção
+    🔗 Link: https://gitlab.com/org/repo/-/merge_requests/42
+
 ---
 ### 🔐 Como funcionam os grupos via .env?
 
@@ -222,7 +283,7 @@ EX:
   
     req(c) -> .env(HATSAPP_GROUP_C=1203zzzz@g.us # Pipeline GitLab)
 
-### 📌 Come pegar o id do grupo?
+### 📌 Como pegar o id do grupo?
 
 Já deixei um script pronto para isso: "src/scripts/listar-grupos.js"
 
