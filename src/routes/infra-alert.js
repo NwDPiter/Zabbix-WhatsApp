@@ -5,6 +5,17 @@ const { client, isReady } = require('../services/whatsappClient');
 const logger = require('../config/logger');
 const authMiddleware = require('../middlewares/auth');
 
+require('dotenv').config(); // Garante que o .env seja carregado
+
+// Mapear os grupos disponíveis a partir do .env
+const GROUP_IDS = {
+  a: process.env.WHATSAPP_GROUP_A,
+  b: process.env.WHATSAPP_GROUP_B,
+  c: process.env.WHATSAPP_GROUP_C,
+  d: process.env.WHATSAPP_GROUP_D,
+  e: process.env.WHATSAPP_GROUP_E
+};
+
 // Middleware de autenticação
 router.use(authMiddleware);
 
@@ -28,25 +39,26 @@ router.post('/infra-alert', infraAlertLimiter, async (req, res) => {
     return res.status(400).json({ error: "Parâmetros 'group' e 'message' são obrigatórios." });
   }
 
+  const targetId = GROUP_IDS[group];
+
+  if (!targetId) {
+    logger.error(`Grupo "${group}" não configurado no .env`);
+    return res.status(400).json({ error: 'Grupo não reconhecido. Verifique a chave enviada.' });
+  }
+
   try {
     await client.sendPresenceAvailable(); // Garante que o cliente está disponível para enviar mensagens
-    const chats = await client.getChats();
-    const targetGroup = chats.find(chat => chat.isGroup && chat.name === group);
+    await client.sendMessage(targetId, message);
 
-    if (!targetGroup) {
-      logger.error('Grupo não encontrado');
-      return res.status(404).json({ error: "Grupo não encontrado" });
-    }
-
-    await client.sendMessage(targetGroup.id._serialized, message);
     logger.info(`
         -------------------------------------------
         Mensagem: ${message}
-        Grupo: "${group}"
+        Grupo: "${group}" (ID: ${targetId})
         Status: Enviado com sucesso!
         Data/Hora: ${new Date().toLocaleString()}
         -------------------------------------------
-      `);      
+    `);      
+
     return res.json({ success: true, message: "Mensagem enviada com sucesso!" });
   } catch (error) {
     logger.error("Erro ao enviar mensagem:", error);
